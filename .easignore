@@ -1,0 +1,7 @@
+# Ignore system/user folders
+AppData/
+node_modules/
+*.log
+*.tmp
+*.cache
+*.DS_Store
