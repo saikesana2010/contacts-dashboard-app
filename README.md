@@ -1,20 +1,20 @@
-# Contacts Dashboard App 📱
+# Contacts Dashboard App
 
-A React Native (Expo) app that displays contacts, supports favorites, and persists favorite data using AsyncStorage.
+A mobile app built with React Native (Expo) that:
 
-## ✅ Features
+✅ Fetches contacts from https://randomuser.me/api  
+✅ Displays full name, email, profile picture  
+✅ Has a contact detail screen  
+✅ Allows toggling favorites  
+✅ Uses Zustand for state and persistence  
+✅ Bottom tab navigation between Contacts & Favorites
 
-- 📥 Fetch 10 contacts from `randomuser.me`
-- 👤 View name, email, profile picture
-- ⭐ Mark contacts as favorites
-- 🧠 Favorites are persisted across app restarts (AsyncStorage)
-- 📱 Responsive UI using TypeScript and Functional Components
-- 🧭 Bottom Tab Navigation: Contacts + Favorites
+📦 Technologies:
+- Expo (React Native)
+- Zustand (State Management)
+- AsyncStorage (Persistence)
+- React Navigation
+- TypeScript
 
-## 🚧 Not Implemented (due to time)
-
-- Stats screen with bar chart
-- Export favorites to JSON
-
-## 📁 Folder Structure
-
+🚧 Note:
+Due to time limits, the "Stats Screen" with bar chart and export-to-JSON were skipped.
