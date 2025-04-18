@@ -14,12 +14,17 @@
     "updates": {
       "fallbackToCacheTimeout": 0
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true
     },
     "android": {
-      "permissions": ["READ_CONTACTS", "WRITE_CONTACTS"],
+      "permissions": [
+        "READ_CONTACTS",
+        "WRITE_CONTACTS"
+      ],
       "package": "com.saikesana2010.contactsdashboardapp"
     },
     "web": {
@@ -27,6 +32,11 @@
     },
     "experiments": {
       "newArchEnabled": true
+    },
+    "extra": {
+      "eas": {
+        "projectId": "4bc222fd-ab66-4f25-b1c7-835a6812bb82"
+      }
     }
   }
 }

@@ -1,110 +1,107 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, FlatList, StyleSheet, ActivityIndicator, Button, TouchableOpacity } from 'react-native';
-import * as Contacts from 'expo-contacts';
+import {
+  View,
+  Text,
+  FlatList,
+  StyleSheet,
+  Image,
+  Pressable,
+  ActivityIndicator,
+} from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 
-export default function ContactsScreen({ navigation }: any) {
-  const [contacts, setContacts] = useState<Contacts.Contact[]>([]);
-  const [favorites, setFavorites] = useState<Contacts.Contact[]>([]);
+type Contact = {
+  id: string;
+  name: string;
+  email: string;
+  picture: string;
+};
+
+export default function ContactsScreen(): JSX.Element {
+  const [contacts, setContacts] = useState<Contact[]>([]);
   const [loading, setLoading] = useState(true);
+  const navigation = useNavigation();
 
   useEffect(() => {
-    loadContacts();
-  }, []);
-
-  const loadContacts = async () => {
-    const { status } = await Contacts.requestPermissionsAsync();
-    if (status === 'granted') {
-      const { data } = await Contacts.getContactsAsync({
-        fields: [Contacts.Fields.PhoneNumbers],
-      });
-      setContacts(data);
-    } else {
-      alert('Permission to access contacts was denied');
-    }
-    setLoading(false);
-  };
-
-  const addContact = async () => {
-    const { status } = await Contacts.requestPermissionsAsync();
-    if (status !== 'granted') {
-      alert('Permission denied to add contact.');
-      return;
-    }
-
-    const contact = {
-      [Contacts.Fields.FirstName]: 'New',
-      [Contacts.Fields.LastName]: 'Contact',
-      [Contacts.Fields.PhoneNumbers]: [{
-        label: 'mobile',
-        number: '1234567890',
-      }],
+    const fetchContacts = async () => {
+      try {
+        const response = await fetch('https://randomuser.me/api/?results=10');
+        const data = await response.json();
+        const mappedContacts: Contact[] = data.results.map((user: any) => ({
+          id: user.login.uuid,
+          name: `${user.name.first} ${user.name.last}`,
+          email: user.email,
+          picture: user.picture.medium,
+          phone: user.phone, // Add this line
+        }));        
+        setContacts(mappedContacts);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching contacts:', error);
+        setLoading(false);
+      }
     };
 
-    try {
-      await Contacts.addContactAsync(contact);
-      alert('Contact added!');
-      loadContacts(); // refresh the list
-    } catch (err) {
-      console.error('Error adding contact:', err);
-      alert('Failed to add contact. Check permissions.');
-    }
-  };
+    fetchContacts();
+  }, []);
 
-  const handleFavorite = (contact: Contacts.Contact) => {
-    if (!favorites.find((fav) => fav.id === contact.id)) {
-      const updatedFavorites = [...favorites, contact];
-      setFavorites(updatedFavorites);
-      navigation.navigate('Favorites', { favorites: updatedFavorites });
-    }
-  };
+  const renderItem = ({ item }: { item: Contact }) => (
+    <Pressable
+      style={styles.item}
+      onPress={() =>
+        navigation.navigate('Details' as never, { contact: item } as never)
+      }
+    >
+      <Image source={{ uri: item.picture }} style={styles.image} />
+      <View>
+        <Text style={styles.name}>{item.name}</Text>
+        <Text>{item.email}</Text>
+      </View>
+    </Pressable>
+  );
 
   if (loading) {
-    return <ActivityIndicator size="large" style={styles.loading} />;
+    return (
+      <View style={styles.loading}>
+        <ActivityIndicator size="large" />
+      </View>
+    );
   }
 
   return (
-    <View style={styles.container}>
-      <Button title="Add Contact" onPress={addContact} />
-      <FlatList
-        data={contacts}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <View style={styles.contactItem}>
-            <Text style={styles.name}>{item.name}</Text>
-            <Text style={styles.phone}>
-              {item.phoneNumbers?.[0]?.number ?? 'No number'}
-            </Text>
-            <TouchableOpacity onPress={() => handleFavorite(item)}>
-              <Text style={styles.favoriteBtn}>❤️ Add to Favorites</Text>
-            </TouchableOpacity>
-          </View>
-        )}
-      />
-    </View>
+    <FlatList
+      data={contacts}
+      keyExtractor={(item) => item.id}
+      renderItem={renderItem}
+      contentContainerStyle={styles.container}
+    />
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  contactItem: {
-    padding: 10,
-    borderBottomWidth: 1,
-    borderColor: '#ccc',
-  },
-  name: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  phone: {
-    color: 'gray',
-  },
-  favoriteBtn: {
-    marginTop: 4,
-    color: 'tomato',
+  container: {
+    padding: 16,
   },
   loading: {
     flex: 1,
     justifyContent: 'center',
+    alignItems: 'center',
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomColor: '#ccc',
+    borderBottomWidth: 1,
+    gap: 12,
+  },
+  image: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+  },
+  name: {
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });

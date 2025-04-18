@@ -1,24 +1,29 @@
 import React from 'react';
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Image } from 'react-native';
+import { useStore } from '../store'; // ✅ Import from the new store file
 
-export default function FavoritesScreen({ route }: any) {
-  const favorites = route.params?.favorites ?? [];
+export default function FavoritesScreen(): JSX.Element {
+  const favourites = useStore((state) => state.favourites);
+
+  const renderItem = ({ item }: { item: any }) => (
+    <View style={styles.item}>
+      <Image source={{ uri: item.picture }} style={styles.image} />
+      <View>
+        <Text style={styles.name}>{item.name} ⭐</Text>
+        <Text>{item.email}</Text>
+      </View>
+    </View>
+  );
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Favorite Contacts</Text>
-      {favorites.length === 0 ? (
-        <Text>No favorites added yet.</Text>
+      {favourites.length === 0 ? (
+        <Text style={styles.empty}>No favorites yet!</Text>
       ) : (
         <FlatList
-          data={favorites}
+          data={favourites}
           keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <View style={styles.contactItem}>
-              <Text style={styles.name}>{item.name}</Text>
-              <Text>{item.phoneNumbers?.[0]?.number ?? 'No number'}</Text>
-            </View>
-          )}
+          renderItem={renderItem}
         />
       )}
     </View>
@@ -26,19 +31,31 @@ export default function FavoritesScreen({ route }: any) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 16 },
-  header: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    marginBottom: 12,
+  container: {
+    flex: 1,
+    padding: 16,
   },
-  contactItem: {
-    paddingVertical: 10,
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 12,
+    borderBottomColor: '#ccc',
     borderBottomWidth: 1,
-    borderColor: '#ccc',
+    gap: 12,
+  },
+  image: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
   },
   name: {
     fontSize: 16,
-    fontWeight: '600',
+    fontWeight: 'bold',
+  },
+  empty: {
+    textAlign: 'center',
+    marginTop: 30,
+    fontSize: 16,
+    color: '#888',
   },
 });
